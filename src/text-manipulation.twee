@@ -1,0 +1,55 @@
+:: _Add All Text Manipulation
+{embed passage: '_Add Text Collection Modifier and Insert'}
+
+
+:: _Add Text Collection Modifier and Insert
+[Javascript]
+engine.state.set('__collected', '');
+engine.extend('2.0.0', () => {
+    engine.template.modifiers.add({
+    	match: /^collect\b/i,
+        process(output, {state, invocation}) {
+            const modifier = invocation?.slice(7).trimStart().replace(/\s.*/, '').toLowerCase() || '';
+            if (config.testing && !(modifier === '' || modifier === 'new' || modifier === 'no-space')) {
+                console.warn(
+                    `"collect" modifier can only be [collect], [collect new], or [collect no-space], but was called as [${invocation}]`
+                );
+
+            }
+            // Only reset the collection variable if there's text
+            // to replace it with. That way, an [if...; collect new]
+            // won't empty the collection variable even if the
+            // if statement is false.
+            if (modifier === 'new' && output.text != '') {
+                __collected = '';
+            }
+            if (modifier === 'no-space') {
+            	__collected = __collected.trimEnd();
+                output.text = output.text.trimStart();
+            }
+            else {
+            	__collected += ' ';
+            }
+            __collected += output.text;
+            output.text = '';
+        }
+    });
+});
+
+[Javascript]
+engine.template.inserts.add({
+	match: /^show\s+collected/i,
+	render: (first_arg, props, invocation) => {
+    	if (typeof(__collected) === undefined) {
+            if (config.testing) {
+            	throw new Error('{show collected} called before any text was collected');
+            }
+        }
+    	const output = __collected;
+        if (!props['keep']) {
+        	__collected = '';
+        }
+        return output;
+	}
+});
+
