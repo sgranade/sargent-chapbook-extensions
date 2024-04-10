@@ -1,5 +1,7 @@
 :: _Add All Text Manipulation
 {embed passage: '_Add Text Collection Modifier and Insert'}
+{embed passage: '_Add Conditional Insert'}
+
 
 
 :: _Add Text Collection Modifier and Insert
@@ -51,5 +53,20 @@ engine.template.inserts.add({
         }
         return output;
 	}
+});
+
+
+
+:: _Add Conditional Insert
+[Javascript]
+engine.extend('2.0.0', () => {
+    engine.template.inserts.add({
+    	match: /^if\s+[^:,]/i,
+        render: (first_arg, props, invocation) => {
+            const condition = invocation.split(':')[0].slice(3);
+            const value = new Function(`return ${condition};`)();
+            return ((value) ? first_arg : props['else']) || '';
+        }
+    });
 });
 
