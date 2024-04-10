@@ -1,0 +1,267 @@
+:: StoryTitle
+Sargent Chapbook Extensions Demo
+
+
+
+:: StoryData
+{
+    "ifid": "B90BF23F-A19F-4948-9299-6A9D36E6A434",
+    "format": "Chapbook",
+    "format-version": "2.0.0",
+    "start": "Start"
+}
+
+
+
+:: StyleSheet [stylesheet]
+code {
+    font-size: 16px;
+}
+
+
+
+:: Start
+{embed passage: '_Add All Text Manipulation'}
+
+{embed passage: 'List of Extensions'}
+
+
+
+:: List of Extensions
+[cont]
+## Sargent Chapbook Extensions Demo
+
+Let's see the extensions in action!
+
+> [[Text Collection]]
+
+
+
+:: Text Collection
+showText: false
+--
+## Text Collection: Overview
+
+The `[collect]` modifier collects text to be shown later or manipulated. All text that follows the modifier
+is saved to be shown later using the insert <code>&lcub;show collected&rcub;</code>.
+
+Let's try it out. Here's what the underlying code looks like:
+
+<code>
+First, some regular text.
+
+ [collect] \
+If everything worked, _this_ text was collected!
+
+ [cont] \
+Second, some more text.
+
+Finally, let's show what we collected! &lcub;show collected&rcub;
+</code>
+
+Here's what it looks like when Chapbook renders it.
+
+***
+
+First, some regular text.
+
+[collect]
+If everything worked, _this_ text was collected!
+
+[cont]
+Second, some more text.
+
+Finally, let's show what we collected! {show collected}
+
+***
+
+That's all you need to know to use it, though we've got more advanced examples.
+
+> [[Collecting more than one chunk of text->Collect Multiple Texts]]
+> [[Resetting or modifying what's collected->Reset or Modify Text Collection]]
+> [[Summary of all text collection capabilities->Text Collection Summary]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: Collect Multiple Texts
+showText: !showText
+--
+## Text Collection: Multiple Texts
+
+You can use `[collect]` more than once to keep adding to what you've collected. For this example, we'll
+collect text by embedding multiple passages that have collects in them.
+
+By default, `[collect]` puts a space between each new collection. If you're using it to build, say, a
+description where you need to skip that space, you can use `[collect no-space]`.
+
+We'll also show optional collection of text using an `[if]` modifier controlled by the `showText` variable.
+_On this visit, `showText` is **{showText}**._
+
+Here's the code in this passage:
+
+<code>
+&lcub;embed passage: 'Collect 1'&rcub; <br>
+&lcub;embed passage: 'Collect 2'&rcub; <br>
+&lcub;embed passage: 'Collect 3'&rcub;
+
+&lcub;show collected&rcub;
+</code>
+
+The `Collect 1` passage contains:
+
+<code>
+ [collect] <br>
+The first embedded passage has a single section of text.
+</code>
+
+The `Collect 2` passage contains:
+
+<code>
+ [collect] <br>
+The second embedded passage has an optional section controlled by an [if showText] modifier. <br>
+ [if showText; collect] <br>
+That modifier is true, so this optional section was collected.
+</code>
+
+The `Collect 3` passage contains:
+
+<code>
+ [collect no-space] <br>
+The third embedded passage used the [collect no-space] modifier, so there's no space between
+this sentence and the previous one.
+</code>
+
+Here's how Chapbook renders all of that.
+
+***
+
+{embed passage: 'Collect 1'}
+{embed passage: 'Collect 2'}
+{embed passage: 'Collect 3'}
+
+{show collected}
+
+***
+
+
+> [[Do this again, only this time {if showText: 'without'} showing the conditional collection->Collect Multiple Texts]]
+> [[Resetting or modifying what's collected->Reset or Modify Text Collection]]
+> [[Summary of all text collection capabilities->Text Collection Summary]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: Collect 1
+[collect]
+The first embedded passage has a single section of text.
+
+
+
+:: Collect 2
+[collect]
+The second embedded passage has an optional section controlled by an `[if showText]` modifier.
+[if showText; collect]
+That modifier is true, so this optional section was collected.
+
+
+
+:: Collect 3
+[collect no-space]
+The third embedded passage used the `[collect no-space]` modifier, so there's no space between
+this sentence and the previous one.
+
+
+
+:: Reset or Modify Text Collection
+__collected: ''
+--
+## Text Collection: Reset or Modify Text Collection
+
+By default, `[collect]` adds to any text that's already been collected, and `&lcub;show collected&rcub;` empties the
+collection so you can start over. You can change both of those behaviors.
+
+`[collect new]` gets rid of all the previously-collected text and starts over.
+
+<code>&lcub;show collected, keep: true&rcub;</code> shows the collected text without getting rid of it.
+
+Finally, the collected text is stored in the Chapbook variable `__collected`. You can always work directly with that variable.
+
+Let's try that out. Here's the code in this passage:
+
+<code>
+At the start, `__collected` contains: &lcub;__collected}
+
+ [collect] \
+If this works, this text will be thrown away.
+
+ [cont] \
+After the first collect, `__collected` contains: &lcub;__collected}
+
+ [collect new] \
+This should be the only text that's collected.
+
+ [cont] \
+After the second collect, `__collected` contains: &lcub;__collected}
+
+Let's show the collection using the insert: &lcub;show collected, keep: true}.
+
+After the insert with `keep: true`, `__collected` contains: &lcub;__collected}
+</code>
+
+Here's how Chapbook renders it.
+
+***
+
+At the start, `__collected` contains: {__collected}
+
+[collect]
+If this works, this text will be thrown away.
+
+[cont]
+After the first collect, `__collected` contains: {__collected}
+
+[collect new]
+This should be the only text that's collected.
+
+[cont]
+After the second collect, `__collected` contains: {__collected}
+
+Let's show the collection using the insert: {show collected, keep: true}.
+
+After the insert with `keep: true`, `__collected` contains: {__collected}
+
+***
+
+> [[Collecting more than one chunk of text->Collect Multiple Texts]]
+> [[Summary of all text collection capabilities->Text Collection Summary]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: Text Collection Summary
+## Text Collection: Summary
+
+### The Modifier
+
+| Modifier | What it does |
+| -------- | ------------ |
+| `[collect]` | Collect the text that follows and **add it** to any already-collected text. |
+| `[collect no-space]` | Collect the text that follows and add it to any already-collected text **with no space between them**. |
+| `[collect new]` | Collect the text that follows, **replacing** any already-collected text. |
+
+### The Insert
+
+| Insert | What it does |
+| ------ | ------------ |
+| <code>&lcub;show collected&rcub;</code> | Show the collected text and **empty the collection**. |
+| <code>&lcub;show collected, keep: true&rcub;</code> | Show the collected text and **keep the collection**. |
+
+### Under the Hood
+
+The collected text is kept in the `__collected` variable.
+
+> [[Collecting more than one chunk of text->Collect Multiple Texts]]
+> [[Resetting or modifying what's collected->Reset or Modify Text Collection]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
