@@ -16,11 +16,37 @@ Sargent Chapbook Extensions Demo
 :: StyleSheet [stylesheet]
 code {
     font-size: 16px;
+    background: #f1f3f5;
+    padding-inline-start: 5px;
+    padding-inline-end: 5px;
+}
+pre {
+    display: block;
+    font-size: 16px;
+    margin: 0;
+    padding-block-start: 1em;
+    padding-block-end: 1em;
+    padding-inline-start: 20px;
+    padding-inline-end: 20px;
+    background: #f1f3f5;
+}
+blockquote {
+    display: block;
+    margin: 0;
+    padding-block-start: 1em;
+    padding-block-end: 1em;
+    padding-inline-start: 20px;
+    padding-inline-end: 20px;
+    background: #ebfbee;
 }
 
 
 
 :: Start
+showText: false
+hasKey: false
+applesPicked: 1
+--
 {embed passage: '_Add All Text Manipulation'}
 
 {embed passage: 'List of Extensions'}
@@ -34,11 +60,13 @@ code {
 Let's see the extensions in action!
 
 > [[Text Collection]]
+> [[Conditional Insert]]
 
 
 
 :: Text Collection
-showText: false
+_collectModifier: "[collect]"
+_contModifier: "[cont]"
 --
 ## Text Collection: Overview
 
@@ -47,22 +75,21 @@ is saved to be shown later using the insert <code>&lcub;show collected&rcub;</co
 
 Let's try it out. Here's what the underlying code looks like:
 
-<code>
+<pre>
 First, some regular text.
 
- [collect] \
+{_collectModifier}
 If everything worked, _this_ text was collected!
 
- [cont] \
+{_contModifier}
 Second, some more text.
 
 Finally, let's show what we collected! &lcub;show collected&rcub;
-</code>
+</pre>
 
 Here's what it looks like when Chapbook renders it.
 
-***
-
+<blockquote>
 First, some regular text.
 
 [collect]
@@ -72,8 +99,7 @@ If everything worked, _this_ text was collected!
 Second, some more text.
 
 Finally, let's show what we collected! {show collected}
-
-***
+</blockquote>
 
 That's all you need to know to use it, though we've got more advanced examples.
 
@@ -85,6 +111,9 @@ That's all you need to know to use it, though we've got more advanced examples.
 
 
 :: Collect Multiple Texts
+_collectModifier: "[collect]"
+_collectNoSpaceModifier: "[collect no-space]"
+_ifShowCollectModifier: "[if showText; collect]"
 showText: !showText
 --
 ## Text Collection: Multiple Texts
@@ -100,52 +129,50 @@ _On this visit, `showText` is **{showText}**._
 
 Here's the code in this passage:
 
-<code>
-&lcub;embed passage: 'Collect 1'&rcub; <br>
-&lcub;embed passage: 'Collect 2'&rcub; <br>
+<pre>
+&lcub;embed passage: 'Collect 1'&rcub;
+&lcub;embed passage: 'Collect 2'&rcub;
 &lcub;embed passage: 'Collect 3'&rcub;
 
 &lcub;show collected&rcub;
-</code>
+</pre>
 
 The `Collect 1` passage contains:
 
-<code>
- [collect] <br>
+<pre>
+{_collectModifier}
 The first embedded passage has a single section of text.
-</code>
+</pre>
 
 The `Collect 2` passage contains:
 
-<code>
- [collect] <br>
-The second embedded passage has an optional section controlled by an [if showText] modifier. <br>
- [if showText; collect] <br>
+<pre>
+{_collectModifier}
+The second embedded passage has an optional section controlled by an [if showText] modifier.
+{_ifShowCollectModifier}
 That modifier is true, so this optional section was collected.
-</code>
+</pre>
 
 The `Collect 3` passage contains:
 
-<code>
- [collect no-space] <br>
-The third embedded passage used the [collect no-space] modifier, so there's no space between
+<pre>
+{_collectNoSpaceModifier}
+The third embedded passage used the {_collectNoSpaceModifier} modifier, so there's no space between
 this sentence and the previous one.
-</code>
+</pre>
 
 Here's how Chapbook renders all of that.
 
-***
-
+<blockquote>
 {embed passage: 'Collect 1'}
 {embed passage: 'Collect 2'}
 {embed passage: 'Collect 3'}
 
 {show collected}
+</blockquote>
 
-***
 
-
-> [[Do this again, only this time {if showText: 'without'} showing the conditional collection->Collect Multiple Texts]]
+> [[Show this again, only this time with{if showText: 'out'} the conditional collection->Collect Multiple Texts]]
 > [[Resetting or modifying what's collected->Reset or Modify Text Collection]]
 > [[Summary of all text collection capabilities->Text Collection Summary]]
 > **[[Back to the list of extensions->List of Extensions]]**
@@ -174,6 +201,11 @@ this sentence and the previous one.
 
 
 :: Reset or Modify Text Collection
+_collectModifier: "[collect]"
+_collectNewModifier: "[collect new]"
+_contModifier: "[cont]"
+_showCollectedKeepInsert: "{show collected, keep: true}"
+_collectedVariableShow: "{__collected}"
 __collected: ''
 --
 ## Text Collection: Reset or Modify Text Collection
@@ -189,31 +221,30 @@ Finally, the collected text is stored in the Chapbook variable `__collected`. Yo
 
 Let's try that out. Here's the code in this passage:
 
-<code>
-At the start, `__collected` contains: &lcub;__collected}
+<pre>
+At the start, `__collected` contains: {_collectedVariableShow}
 
- [collect] \
+{_collectModifier}
 If this works, this text will be thrown away.
 
- [cont] \
-After the first collect, `__collected` contains: &lcub;__collected}
+{_contModifier}
+After the first collect, `__collected` contains: {_collectedVariableShow}
 
- [collect new] \
+{_collectNewModifier}
 This should be the only text that's collected.
 
- [cont] \
-After the second collect, `__collected` contains: &lcub;__collected}
+{_contModifier}
+After the second collect, `__collected` contains: {_collectedVariableShow}
 
-Let's show the collection using the insert: &lcub;show collected, keep: true}.
+Let's show the collection using the insert with `keep: true`: {_showCollectedKeepInsert}
 
-After the insert with `keep: true`, `__collected` contains: &lcub;__collected}
-</code>
+After the insert with `keep: true`, `__collected` contains: {_collectedVariableShow}
+</pre>
 
 Here's how Chapbook renders it.
 
-***
-
-At the start, `__collected` contains: {__collected}
+<blockquote>
+At the start, <code>__collected</code> contains: {__collected}
 
 [collect]
 If this works, this text will be thrown away.
@@ -227,11 +258,10 @@ This should be the only text that's collected.
 [cont]
 After the second collect, `__collected` contains: {__collected}
 
-Let's show the collection using the insert: {show collected, keep: true}.
+Let's show the collection using the insert with `keep: true`: {show collected, keep: true}
 
 After the insert with `keep: true`, `__collected` contains: {__collected}
-
-***
+</blockquote>
 
 > [[Collecting more than one chunk of text->Collect Multiple Texts]]
 > [[Summary of all text collection capabilities->Text Collection Summary]]
@@ -263,5 +293,76 @@ The collected text is kept in the `__collected` variable.
 
 > [[Collecting more than one chunk of text->Collect Multiple Texts]]
 > [[Resetting or modifying what's collected->Reset or Modify Text Collection]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: Conditional Insert
+_ifInsert1: "{if hasKey: 'You could try [[unlocking it]].'}"
+_ifInsert2: "{if hasKey: 'You could try [[unlocking it]].', else: 'You need a key.'}"
+_ifInsert3: "{applesPicked} apple{if (applesPicked > 1): 's'}"
+hasKey: !hasKey
+applesPicked: applesPicked + 1
+applesPicked (applesPicked > 2): 1
+--
+## Conditional Insert
+
+### Showing Text When a Condition is True
+
+The conditional insert is like the `[if]` conditional display modifier, except it's an insert
+that you can use in the middle of other text.
+
+In this passage, the variable `hasKey` is {hasKey}. The code:
+
+<pre>
+The door is locked. {_ifInsert1}
+</pre>
+
+produces the following:
+
+<blockquote>
+The door is locked. {if hasKey: 'You could try [[unlocking it]].'}
+</blockquote>
+
+### Showing Different Text When a Condition is False
+
+You can also provide text to show if the condition evaluates to false. The code:
+
+<pre>
+The door is locked. {_ifInsert2}
+</pre>
+
+produces the following:
+
+<blockquote>
+The door is locked. {if hasKey: 'You could try [[unlocking it]].', else: 'You need a key.'}
+</blockquote>
+
+### Adding Text Without a Space
+
+Where the conditional insert is especially useful is in adding a snippet of text onto another word.
+In the following example, the variable `applesPicked` is {applesPicked}. The code:
+
+<pre>
+You pick {_ifInsert3}.
+</pre>
+
+produces the following:
+
+<blockquote>
+You pick {applesPicked} apple{if (applesPicked > 1): 's'}.
+</blockquote>
+
+
+> [[Show this again, only this time with different variable values->Conditional Insert]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: unlocking it
+
+You unlocked the door!
+
+> [[Return to the Conditional Insert example->Conditional Insert]]
 > **[[Back to the list of extensions->List of Extensions]]**
 
