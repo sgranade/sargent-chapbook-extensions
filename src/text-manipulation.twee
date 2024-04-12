@@ -75,7 +75,7 @@ engine.extend('2.0.0', () => {
 
 :: _Add One Of and First Time Inserts
 [Javascript]
-engine.state.set('oneOfTracking', {});
+engine.state.set('zOneOfTracking', {});
 libfunc = {};
 libfunc.randInt = (max) => {
     return Math.floor(Math.random() * max);  // Random int from 0 to max-1
@@ -87,16 +87,26 @@ libfunc.shuffleArray = (arr) => {
     }
     return arr;
 }
+libfunc.embarassinglySimpleHashCode = (s) => {
+    let hash = 0;
+    for (let i = 0; i < s.length; ++i) {
+        let chr = s.charCodeAt(i);
+        hash = (hash << 5) - hash + chr;
+        hash |= 0;
+    }
+    return hash;
+}
 libfunc.hashInvocation = (invocation) => {
-    return passage.name + invocation;
+    //return passage.name + invocation;
+    return libfunc.embarassinglySimpleHashCode(passage.name + invocation).toString();
 }
 engine.extend('2.0.0', () => {
     engine.template.inserts.add({
         match: /^first\s+time\b/i,
         render: (to_print, props, invocation) => {
             const hash = libfunc.hashInvocation(invocation);
-            if (oneOfTracking[hash] === undefined) {
-                oneOfTracking[hash] = true;
+            if (zOneOfTracking[hash] === undefined) {
+                zOneOfTracking[hash] = true;
                 return to_print;
             }
         }
@@ -109,7 +119,7 @@ engine.extend('2.0.0', () => {
         match: /^one\s+of\b/i,
         render(choices, props, invocation) {
             const hash = libfunc.hashInvocation(invocation);
-            let prev = oneOfTracking[hash];
+            let prev = zOneOfTracking[hash];
             let ret;
             const order = (props.order || '').toLowerCase();
             if (order === 'random' || order === '') {
@@ -117,7 +127,7 @@ engine.extend('2.0.0', () => {
                 while (choice == prev) {
                     choice = libfunc.randInt(choices.length);
                 }
-                oneOfTracking[hash] = choice;
+                zOneOfTracking[hash] = choice;
                 ret = choices[choice];
             }
             else if (order === 'pure random') {
@@ -128,7 +138,7 @@ engine.extend('2.0.0', () => {
                     prev = libfunc.shuffleArray([...choices]);
                 }
                 ret = prev.pop();
-                oneOfTracking[hash] = prev;
+                zOneOfTracking[hash] = prev;
             }
             else if (order === 'stopping' || order === 'cycling') {
                 if (prev === undefined) {
@@ -140,7 +150,7 @@ engine.extend('2.0.0', () => {
                         prev = (order === 'stopping') ? choices.length - 1 : 0;
                     }
                 }
-                oneOfTracking[hash] = prev;
+                zOneOfTracking[hash] = prev;
                 ret = choices[prev];
             }
             else {
