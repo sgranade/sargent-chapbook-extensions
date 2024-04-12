@@ -1,6 +1,7 @@
 :: _Add All Text Manipulation
 {embed passage: '_Add Text Collection Modifier and Insert'}
 {embed passage: '_Add Conditional Insert'}
+{embed passage: '_Add One Of and First Time Inserts'}
 
 
 
@@ -70,3 +71,87 @@ engine.extend('2.0.0', () => {
     });
 });
 
+
+
+:: _Add One Of and First Time Inserts
+[Javascript]
+engine.state.set('oneOfTracking', {});
+libfunc = {};
+libfunc.randInt = (max) => {
+    return Math.floor(Math.random() * max);  // Random int from 0 to max-1
+}
+libfunc.shuffleArray = (arr) => {
+    for (let i = arr.length - 1; i > 0; --i) {
+        const j = libfunc.randInt(i + 1);
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+libfunc.hashInvocation = (invocation) => {
+    return passage.name + invocation;
+}
+engine.extend('2.0.0', () => {
+    engine.template.inserts.add({
+        match: /^first\s+time\b/i,
+        render: (to_print, props, invocation) => {
+            const hash = libfunc.hashInvocation(invocation);
+            if (oneOfTracking[hash] === undefined) {
+                oneOfTracking[hash] = true;
+                return to_print;
+            }
+        }
+    });
+});
+
+[Javascript]
+engine.extend('2.0.0', () => {
+    engine.template.inserts.add({
+        match: /^one\s+of\b/i,
+        render(choices, props, invocation) {
+            const hash = libfunc.hashInvocation(invocation);
+            let prev = oneOfTracking[hash];
+            let ret;
+            const order = (props.order || '').toLowerCase();
+            if (order === 'random' || order === '') {
+                let choice = prev;
+                while (choice == prev) {
+                    choice = libfunc.randInt(choices.length);
+                }
+                oneOfTracking[hash] = choice;
+                ret = choices[choice];
+            }
+            else if (order === 'pure random') {
+                ret = choices[libfunc.randInt(choices.length)];
+            }
+            else if (order === 'shuffled') {
+                if (prev === undefined || prev.length == 0) {
+                    prev = libfunc.shuffleArray([...choices]);
+                }
+                ret = prev.pop();
+                oneOfTracking[hash] = prev;
+            }
+            else if (order === 'stopping' || order === 'cycling') {
+                if (prev === undefined) {
+                    prev = 0;
+                }
+                else {
+                    prev++;
+                    if (prev >= choices.length) {
+                        prev = (order === 'stopping') ? choices.length - 1 : 0;
+                    }
+                }
+                oneOfTracking[hash] = prev;
+                ret = choices[prev];
+            }
+            else {
+                if (config.testing) {
+                    throw new Error(
+                        `The {one of} order was "${order}" but must be one of "random", "pure random", "shuffled", "stopping", or "cycling"`
+                    );
+                }
+                ret = invocation;
+            }
+            return ret;
+        }
+    });
+});
