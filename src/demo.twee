@@ -39,6 +39,9 @@ blockquote {
     padding-inline-end: 20px;
     background: #ebfbee;
 }
+td {
+    vertical-align: top;
+}
 
 
 
@@ -61,17 +64,19 @@ Let's see the extensions in action!
 
 > [[Text Collection]]
 > [[Conditional Insert]]
+> [[One Of and First Time Inserts->One Of Insert]]
 
 
 
 :: Text Collection
 _collectModifier: "[collect]"
 _contModifier: "[cont]"
+_showCollectedInsert: "{show collected}"
 --
 ## Text Collection: Overview
 
 The `[collect]` modifier collects text to be shown later or manipulated. All text that follows the modifier
-is saved to be shown later using the insert <code>&lcub;show collected&rcub;</code>.
+is saved to be shown later using the insert <code>{_showCollectedInsert}</code>.
 
 Let's try it out. Here's what the underlying code looks like:
 
@@ -84,7 +89,7 @@ If everything worked, _this_ text was collected!
 {_contModifier}
 Second, some more text.
 
-Finally, let's show what we collected! &lcub;show collected&rcub;
+Finally, let's show what we collected! {_showCollectedInsert}
 </pre>
 
 Here's what it looks like when Chapbook renders it.
@@ -366,3 +371,180 @@ You unlocked the door!
 > [[Return to the Conditional Insert example->Conditional Insert]]
 > **[[Back to the list of extensions->List of Extensions]]**
 
+
+
+:: One Of Insert
+oneOfInsert: "{one of}"
+firstTimeInsert: "{first time}"
+_oneOfInsertHeadsAndTails: "{one of: ['heads', 'tails']}"
+_oneOfInsertWithOptions: "{one of: ['Water splashes from the ceiling.', 'From ahead, a bat's squeak echoes off of the cave walls.', 'Your torch flickers.']}"
+--
+## One Of and First Time Inserts: Overview
+
+The `{oneOfInsert}` insert lets you display varying text each time a player reaches
+a passage. For example, say you wanted to show different flavor text every time a
+player entered a cave.
+
+<pre>
+The cave is low and dark. {_oneOfInsertWithOptions}
+</pre>
+
+The first time the player visits the passage, it might print,
+
+<blockquote>
+The cave is low and dark. From ahead, a bat's squeak echoes off of the cave walls.
+</blockquote>
+
+The next time, it might print,
+
+<blockquote>
+The cave is low and dark. Water splashes from the ceiling.
+</blockquote>
+
+`{oneOfInsert}` takes an array of text items, called _choices_, and randomly shows one of
+thoise choices. The next time, it shows a different choice. While each choice is randomly
+selected, the same text won't be shown twice in a row. That is, the insert
+`{_oneOfInsertHeadsAndTails}`  will never show `heads` and then `heads` again.
+
+You can specify different orders to show the choices in, including shuffling the choices or
+showing them in order until they run out. There's also a special case of showing choices: 
+showing text only the first time the player visits the passage.
+
+> [[Controlling the order of what's shown->One Of Insert Ordering]]
+> [[Showing text the first time only->First Time Insert]]
+> [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: One Of Insert Ordering
+_oneOfInsertSummary: "{one of: ['choice 1', 'choice 2', 'choice 3'], order: 'order'}"
+--
+## One Of and First Time Inserts: Controlling the Order
+
+You can control the order that the `{oneOfInsert}` insert shows its choices using the
+`order` parameter:
+
+<pre>
+{_oneOfInsertSummary}
+</pre>
+
+`order` can be any of the following:
+
+- `'random'`: Show a random choice each visit without showing the same thing twice in a row. The default.
+- `'pure random'`: Like `random`, but choices can be shown twice in a row.
+- `'shuffled'`: The choices are shuffled, then shown in that shuffled order. Once all of them have been shown, they're re-shuffled.
+- `'stopping'`: Show the choices in order, stopping with the last one and thereafter showing it forever.
+- `'cycling'`: Show the choices in order, repeating the order after the last one's shown.
+
+> [[Show `{oneOfInsert}` ordering in action->One Of Demo]]
+> [[Showing text the first time only->First Time Insert]]
+> [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: One Of Demo
+_arrayOfChoices: ['apple', 'banana', 'chainsaw', 'durian']
+_oneOfDemoFirstPart: "{one of:"
+_rbrace: "}"
+--
+## Showing One Of Ordering in Action
+
+Here's what happens if we take the choices `{_arrayOfChoices}` and show them
+in different orders.
+
+<blockquote>
+
+- Random: {one of: ['apple', 'banana', 'chainsaw', 'durian'], order: 'random'}
+- Pure random: {one of: ['apple', 'banana', 'chainsaw', 'durian'], order: 'pure random'}
+- Shuffled: {one of: ['apple', 'banana', 'chainsaw', 'durian'], order: 'shuffled'}
+- Stopping: {one of: ['apple', 'banana', 'chainsaw', 'durian'], order: 'stopping'}
+- Cycling: {one of: ['apple', 'banana', 'chainsaw', 'durian'], order: 'cycling'}
+
+</blockquote>
+
+> [[View this passage again->One Of Demo]]
+> [[Showing text the first time only->First Time Insert]]
+> [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: First Time Insert
+_firstTimeExample: '{first time: "You shield your eyes, but can\'t see who\'s behind the light."}'
+--
+## One Of and First Time Inserts: Showing Text the First Time
+
+The `{firstTimeInsert}` insert only shows
+its text the first time the player visits the passage. Consider the code:
+
+<pre>
+The floodlight illuminating you is painfully bright. {_firstTimeExample}
+</pre>
+
+The first time the player visits the passage, they'll see:
+
+<blockquote>
+The floodlight illuminating you is painfully bright. You shield your eyes, but can't 
+see who's behind the light.
+</blockquote>
+
+The second time, and every time after that, the player will see:
+
+<blockquote>
+The floodlight illuminating you is painfully bright.
+</blockquote>
+
+> [[Show `{firstTimeInsert}` in action->First Time Demo]]
+> [[Controlling the order of what's shown->One Of Insert Ordering]]
+> [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: First Time Demo
+_firstTimeInsertDemo: "{first time: 'You catch your foot on a stalagmite and nearly fall.'}"
+--
+## Showing First Time in Action
+
+This passage contains the code:
+
+<pre>
+The cave is low and dark. {_firstTimeInsertDemo}
+</pre>
+
+Here's what it looks like.
+
+<blockquote>
+The cave is low and dark. {first time: 'You catch your foot on a stalagmite and nearly fall.'}
+</blockquote>
+
+> [[View this passage again->First Time Demo]]
+> [[Controlling the order of what's shown->One Of Insert Ordering]]
+> [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: One Of Insert Summary
+_firstTimeInsertSummary: "{first time: 'This will only show up on the first visit.'}"
+_oneOfInsertSummary: "{one of: ['choice 1', 'choice 2', 'choice 3'], order: 'order'}"
+--
+## One Of and First Time Inserts: Summary
+
+`{_firstTimeInsertSummary}` to show something only the first time a passage is visited.
+
+`{_oneOfInsertSummary}` to show one of the array of choices.
+
+| `order` | What It Does |
+| -------- | ------------ |
+| `'random'` | (default) Show a random choice each visit, but no choice will be shown twice in a row. |
+| `'pure random'` | Show a random choice each visit. |
+| `'shuffled'` | Shuffle the choice the first time and then show one at a time in that shuffled order. When all choice have been shown, they're re-shuffled. |
+| `'stopping'` | Show the choices in order. After the last one's shown, it's shown again forever after. |
+| `'cycling'` | Show the choices in order. After the last one's shown, the sequence starts over with the first. |
+
+> [[Controlling the order of what's shown->One Of Insert Ordering]]
+> [[Showing text the first time only->First Time Insert]]
+> **[[Back to the list of extensions->List of Extensions]]**
