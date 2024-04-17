@@ -215,12 +215,12 @@ __collected: ''
 --
 ## Text Collection: Reset or Modify Text Collection
 
-By default, `[collect]` adds to any text that's already been collected, and `&lcub;show collected&rcub;` empties the
+By default, `[collect]` adds to any text that's already been collected, and <code>{_showCollectedInsert}</code> empties the
 collection so you can start over. You can change both of those behaviors.
 
 `[collect new]` gets rid of all the previously-collected text and starts over.
 
-<code>&lcub;show collected, keep: true&rcub;</code> shows the collected text without getting rid of it.
+<code>{_showCollectdKeepInsert}</code> shows the collected text without getting rid of it.
 
 Finally, the collected text is stored in the Chapbook variable `__collected`. You can always work directly with that variable.
 
