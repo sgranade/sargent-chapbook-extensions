@@ -9,8 +9,8 @@ The extentions are focused on manipulating text to show later or display somethi
 
 - The `[collect]` modifier saves text to a variable instead of showing it, letting you build up longer descriptions that you can then show using the `{show collected}` insert.
 - The `{if [condition]}` insert only shows text if the condition is true.
-- The `{first time}` insert shows text only the first time a player visits the passage. 
-- The `{one of}` insert shows a different text every time the player visits the passage.
+- The `{first time}` insert shows text one time only. 
+- The `{one of}` insert shows different text every time.
 
 Want to see them in action? [Check out the demo](https://sgranade.github.io/sargent-chapbook-extensions/).
 
@@ -56,16 +56,27 @@ The door is locked. {if hasKey: 'You could try [[unlocking it]].', else: 'You ne
 
 ### First Time Insert
 
-The `{first time}` insert shows text only the first time a player visits the passage. After that, the text isn't shown.
+The `{first time}` insert only shows its text the first time. After that, the text isn't shown.
 
 ```
 The floodlight illuminating you is painfully bright. {first time: "You shield your eyes, but can't see who's behind the light."}
 ```
 
+Note that this isn't tied to the player visiting the passage with the insert, but to the player being _shown the text_. Most of the time that's a distinction without a difference, except when you use the insert in a conditonal block.
+
+Let's extend the example above.
+
+```
+[if floodlightOn]
+The floodlight illuminating you is painfully bright. {first time: "You shield your eyes, but can't see who's behind the light."}
+```
+
+If the floodlight is off the first time the player visits the passage, the `{first time}` insert isn't triggered. That visit doesn't count as the "first time" as far as the insert is concerned.
+
 
 ### One Of Insert
 
-The `{one of}` insert lets you display varying text each time a player reaches a passage. For example, say you wanted to show different flavor text every time a player entered a cave.
+The `{one of}` insert lets you display varying text each time it's triggered. For example, say you wanted to show different flavor text every time a player entered a cave.
 
 ```
 The cave is low and dark. {one of: ['Water splashes from the ceiling.', 'From ahead, a bat's squeak echoes off of the cave walls.', 'Your torch flickers.']}
