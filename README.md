@@ -11,6 +11,7 @@ The extentions are focused on manipulating text to show later or display somethi
 - The `{if [condition]}` insert only shows text if the condition is true.
 - The `{first time}` insert shows text one time only. 
 - The `{one of}` insert shows different text every time.
+- The `{^ [expression]}` insert capitalizes the string value of the variable or expression.
 
 Want to see them in action? [Check out the demo](https://sgranade.github.io/sargent-chapbook-extensions/).
 
@@ -97,3 +98,14 @@ You can control the order that the choices will be shown using the `order` param
 - `'shuffled'`: The choices are shuffled, then shown in that shuffled order. Once all of them have been shown, they’re re-shuffled.
 - `'stopping'`: Show the choices in order, stopping with the last one and thereafter showing it forever.
 - `'cycling'`: Show the choices in order, repeating the order after the last one’s shown.
+
+
+### Capitalization Insert
+
+The `{^ [variable]}` insert capitalizes the variable's contents and shows it. For example, say you had variables corresponding to an NPC's pronouns and you wanted to use one at the start of a sentence.
+
+```
+{^ companion.his} clothes are folded neatly at the foot of {companion.his} bed.
+```
+
+This could display "Their clothes are folded neatly at the foot of their bed" or "His clothes are folded neatly at the foot of his bed."

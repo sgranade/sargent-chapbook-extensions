@@ -1,7 +1,26 @@
 :: _Add All Text Manipulation
+{embed passage: '_Add Capitalization Insert'}
 {embed passage: '_Add Text Collection Modifier and Insert'}
 {embed passage: '_Add Conditional Insert'}
 {embed passage: '_Add One Of and First Time Inserts'}
+
+
+
+:: _Add Capitalization Insert
+[Javascript]
+engine.extend('2.0.0', () => {
+    engine.template.inserts.add({
+        match: /^\^\s+\S+$/i,
+        render(firstArg, props, invocation) {
+            const variableToShow = invocation?.slice(1).trimStart();
+            const valueToShow = engine.state.get(variableToShow);
+            if (!valueToShow) {
+                return `{${invocation}}`;
+            }
+            return valueToShow.slice(0, 1).toLocaleUpperCase() + valueToShow.slice(1);
+        }
+    });
+});
 
 
 

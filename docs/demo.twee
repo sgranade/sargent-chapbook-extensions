@@ -49,6 +49,7 @@ td {
 showText: false
 hasKey: false
 applesPicked: 1
+pronounNum: 1
 --
 {embed passage: '_Add All Text Manipulation'}
 
@@ -65,6 +66,7 @@ Let's see the extensions in action!
 > [[Text Collection]]
 > [[Conditional Insert]]
 > [[One Of and First Time Inserts->One Of Insert]]
+> [[Capitalization]]
 
 
 
@@ -547,4 +549,37 @@ _oneOfInsertSummary: "{one of: ['choice 1', 'choice 2', 'choice 3'], order: 'ord
 
 > [[Controlling the order of what's shown->One Of Insert Ordering]]
 > [[Showing text the first time only->First Time Insert]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: Capitalization
+_capitalizationInsert: "{^ [variable]}"
+_capHisInsert: "{^ companion.his}"
+_hisInsert: "{companion.his}"
+pronounNum: pronounNum + 1
+pronounNum (pronounNum > 3): 1
+companion.his (pronounNum == 1): "his"
+companion.his (pronounNum == 2): "her"
+companion.his (pronounNum == 3): "their"
+--
+## Capitalization
+
+The capitalization insert `{_capitalizationInsert}` capitalizes
+and displays the variable's content.
+
+In this passage, the variable `companion.his` is `{companion.his}`. The code:
+
+<pre>
+{_capHisInsert} clothes are folded neatly at the foot of {_hisInsert} bed.
+</pre>
+
+produces the following:
+
+<blockquote>
+{^ companion.his} clothes are folded neatly at the foot of {companion.his} bed.
+</blockquote>
+
+
+> [[Show this again, only this time with a different choice of pronoun->Capitalization]]
 > **[[Back to the list of extensions->List of Extensions]]**
