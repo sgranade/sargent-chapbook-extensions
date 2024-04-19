@@ -32,28 +32,30 @@ engine.extend('2.0.0', () => {
     	match: /^collect\b/i,
         process(output, {state, invocation}) {
             const modifier = invocation?.slice(7).trimStart().replace(/\s.*/, '').toLowerCase() || '';
-            if (config.testing && !(modifier === '' || modifier === 'new' || modifier === 'no-space')) {
+            if (config.testing && !(modifier === '' || modifier === 'new' || modifier === 'no-space' || modifier === 'new-paragraph')) {
                 console.warn(
-                    `"collect" modifier can only be [collect], [collect new], or [collect no-space], but was called as [${invocation}]`
+                    `"collect" modifier can only be [collect], [collect new], [collect no-space], or [collect new-paragraph], but was called as [${invocation}]`
                 );
 
             }
-            // Only reset the collection variable if there's text
-            // to replace it with. That way, an [if...; collect new]
-            // won't empty the collection variable even if the
-            // if statement is false.
-            if (modifier === 'new' && output.text != '') {
-                __collected = '';
+            // Only perform collection if there's any text. That
+            // prevents weirdness from an [if ...; collect] block.
+            if (output.text != '') {
+                if (modifier === 'new') {
+                    __collected = '';
+                }
+                else {
+                    __collected = __collected.trimEnd();
+                    if (modifier === 'new-paragraph') {
+                        __collected += '\n\n';
+                    }
+                    else if (modifier !== 'no-space' && __collected !== '') {
+                        __collected += ' ';
+                    }
+                }
+                __collected += output.text.trimStart();
+                output.text = '';
             }
-            if (modifier === 'no-space') {
-            	__collected = __collected.trimEnd();
-                output.text = output.text.trimStart();
-            }
-            else {
-            	__collected += ' ';
-            }
-            __collected += output.text;
-            output.text = '';
         }
     });
 });

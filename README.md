@@ -33,7 +33,7 @@ If you're using the Twine visual editor, create a new passage called `_Add All T
 
 The `[collect]` modifier collects text to be shown later or manipulated. All text that follows the modifier is saved to be shown later using the insert `{show collected}`.
 
-You can use `[collect]` more than once to keep adding new text to what's already been collected. By default, a space is added between each new collected text. If you don't want that space, use `[collect no-space]`.
+You can use `[collect]` more than once to keep adding new text to what's already been collected. By default, a single space is added between each new collected text. If you don't want that space, use `[collect no-space]`. If you want a paragraph between them instead, use `[collect new-paragraph]`.
 
 The insert `{show collected}` empties the collection so that you can start over. To show the collected text while keeping it, use the insert `{show collected; keep=true}`. You can also guarantee that you're starting a fresh collection with the modifier `[collect new]`.
 

@@ -259,28 +259,30 @@ engine.extend(&#39;2.0.0&#39;, () =&gt; {
     	match: /^collect\b/i,
         process(output, {state, invocation}) {
             const modifier = invocation?.slice(7).trimStart().replace(/\s.*/, &#39;&#39;).toLowerCase() || &#39;&#39;;
-            if (config.testing &amp;&amp; !(modifier === &#39;&#39; || modifier === &#39;new&#39; || modifier === &#39;no-space&#39;)) {
+            if (config.testing &amp;&amp; !(modifier === &#39;&#39; || modifier === &#39;new&#39; || modifier === &#39;no-space&#39; || modifier === &#39;new-paragraph&#39;)) {
                 console.warn(
-                    `&quot;collect&quot; modifier can only be [collect], [collect new], or [collect no-space], but was called as [${invocation}]`
+                    `&quot;collect&quot; modifier can only be [collect], [collect new], [collect no-space], or [collect new-paragraph], but was called as [${invocation}]`
                 );
 
             }
-            // Only reset the collection variable if there&#39;s text
-            // to replace it with. That way, an [if...; collect new]
-            // won&#39;t empty the collection variable even if the
-            // if statement is false.
-            if (modifier === &#39;new&#39; &amp;&amp; output.text != &#39;&#39;) {
-                __collected = &#39;&#39;;
+            // Only perform collection if there&#39;s any text. That
+            // prevents weirdness from an [if ...; collect] block.
+            if (output.text != &#39;&#39;) {
+                if (modifier === &#39;new&#39;) {
+                    __collected = &#39;&#39;;
+                }
+                else {
+                    __collected = __collected.trimEnd();
+                    if (modifier === &#39;new-paragraph&#39;) {
+                        __collected += &#39;\n\n&#39;;
+                    }
+                    else if (modifier !== &#39;no-space&#39; &amp;&amp; __collected !== &#39;&#39;) {
+                        __collected += &#39; &#39;;
+                    }
+                }
+                __collected += output.text.trimStart();
+                output.text = &#39;&#39;;
             }
-            if (modifier === &#39;no-space&#39;) {
-            	__collected = __collected.trimEnd();
-                output.text = output.text.trimStart();
-            }
-            else {
-            	__collected += &#39; &#39;;
-            }
-            __collected += output.text;
-            output.text = &#39;&#39;;
         }
     });
 });
@@ -459,6 +461,7 @@ That&#39;s all you need to know to use it, though we&#39;ve got more advanced ex
 &gt; [[Summary of all text collection capabilities-&gt;Text Collection Summary]]
 &gt; **[[Back to the list of extensions-&gt;List of Extensions]]**</tw-passagedata><tw-passagedata pid="9" name="Collect Multiple Texts" tags="" position="1100,100" size="100,100">_collectModifier: &quot;[collect]&quot;
 _collectNoSpaceModifier: &quot;[collect no-space]&quot;
+_collectParagraphModifier: &quot;[collect new-paragraph]&quot;
 _ifShowCollectModifier: &quot;[if showText; collect]&quot;
 showText: !showText
 --
@@ -467,8 +470,9 @@ showText: !showText
 You can use `[collect]` more than once to keep adding to what you&#39;ve collected. For this example, we&#39;ll
 collect text by embedding multiple passages that have collects in them.
 
-By default, `[collect]` puts a space between each new collection. If you&#39;re using it to build, say, a
-description where you need to skip that space, you can use `[collect no-space]`.
+By default, `[collect]` puts a single space between each new collection. If you&#39;re using it to build, say, a
+description where you need to skip that space, you can use `[collect no-space]`. If you want a new paragraph
+instead, use `[collect new-paragraph]`.
 
 We&#39;ll also show optional collection of text using an `[if]` modifier controlled by the `showText` variable.
 _On this visit, `showText` is **{showText}**._
@@ -495,8 +499,12 @@ The `Collect 2` passage contains:
 &lt;pre&gt;
 {_collectModifier}
 The second embedded passage has an optional section controlled by an [if showText] modifier.
+
 {_ifShowCollectModifier}
 That modifier is true, so this optional section was collected.
+
+{_collectModifier}
+The second passage ends with this separately-collected sentence.
 &lt;/pre&gt;
 
 The `Collect 3` passage contains:
@@ -505,6 +513,9 @@ The `Collect 3` passage contains:
 {_collectNoSpaceModifier}
 The third embedded passage used the {_collectNoSpaceModifier} modifier, so there&#39;s no space between
 this sentence and the previous one.
+
+{_collectParagraphModifier}
+This last sentence is in a new paragraph.
 &lt;/pre&gt;
 
 Here&#39;s how Chapbook renders all of that.
@@ -524,10 +535,17 @@ Here&#39;s how Chapbook renders all of that.
 &gt; **[[Back to the list of extensions-&gt;List of Extensions]]**</tw-passagedata><tw-passagedata pid="10" name="Collect 1" tags="" position="1225,100" size="100,100">[collect]
 The first embedded passage has a single section of text.</tw-passagedata><tw-passagedata pid="11" name="Collect 2" tags="" position="100,225" size="100,100">[collect]
 The second embedded passage has an optional section controlled by an `[if showText]` modifier.
+
 [if showText; collect]
-That modifier is true, so this optional section was collected.</tw-passagedata><tw-passagedata pid="12" name="Collect 3" tags="" position="225,225" size="100,100">[collect no-space]
+That modifier is true, so this optional section was collected.
+
+[collect]
+The second passage ends with this separately-collected sentence.</tw-passagedata><tw-passagedata pid="12" name="Collect 3" tags="" position="225,225" size="100,100">[collect no-space]
 The third embedded passage used the `[collect no-space]` modifier, so there&#39;s no space between
-this sentence and the previous one.</tw-passagedata><tw-passagedata pid="13" name="Reset or Modify Text Collection" tags="" position="350,225" size="100,100">_collectModifier: &quot;[collect]&quot;
+this sentence and the previous one.
+
+[collect new-paragraph]
+This last sentence is in a new paragraph.</tw-passagedata><tw-passagedata pid="13" name="Reset or Modify Text Collection" tags="" position="350,225" size="100,100">_collectModifier: &quot;[collect]&quot;
 _collectNewModifier: &quot;[collect new]&quot;
 _contModifier: &quot;[cont]&quot;
 _showCollectedKeepInsert: &quot;{show collected, keep: true}&quot;

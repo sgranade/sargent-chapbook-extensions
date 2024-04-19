@@ -120,6 +120,7 @@ That's all you need to know to use it, though we've got more advanced examples.
 :: Collect Multiple Texts
 _collectModifier: "[collect]"
 _collectNoSpaceModifier: "[collect no-space]"
+_collectParagraphModifier: "[collect new-paragraph]"
 _ifShowCollectModifier: "[if showText; collect]"
 showText: !showText
 --
@@ -128,8 +129,9 @@ showText: !showText
 You can use `[collect]` more than once to keep adding to what you've collected. For this example, we'll
 collect text by embedding multiple passages that have collects in them.
 
-By default, `[collect]` puts a space between each new collection. If you're using it to build, say, a
-description where you need to skip that space, you can use `[collect no-space]`.
+By default, `[collect]` puts a single space between each new collection. If you're using it to build, say, a
+description where you need to skip that space, you can use `[collect no-space]`. If you want a new paragraph
+instead, use `[collect new-paragraph]`.
 
 We'll also show optional collection of text using an `[if]` modifier controlled by the `showText` variable.
 _On this visit, `showText` is **{showText}**._
@@ -156,8 +158,12 @@ The `Collect 2` passage contains:
 <pre>
 {_collectModifier}
 The second embedded passage has an optional section controlled by an [if showText] modifier.
+
 {_ifShowCollectModifier}
 That modifier is true, so this optional section was collected.
+
+{_collectModifier}
+The second passage ends with this separately-collected sentence.
 </pre>
 
 The `Collect 3` passage contains:
@@ -166,6 +172,9 @@ The `Collect 3` passage contains:
 {_collectNoSpaceModifier}
 The third embedded passage used the {_collectNoSpaceModifier} modifier, so there's no space between
 this sentence and the previous one.
+
+{_collectParagraphModifier}
+This last sentence is in a new paragraph.
 </pre>
 
 Here's how Chapbook renders all of that.
@@ -195,15 +204,21 @@ The first embedded passage has a single section of text.
 :: Collect 2
 [collect]
 The second embedded passage has an optional section controlled by an `[if showText]` modifier.
+
 [if showText; collect]
 That modifier is true, so this optional section was collected.
 
+[collect]
+The second passage ends with this separately-collected sentence.
 
 
 :: Collect 3
 [collect no-space]
 The third embedded passage used the `[collect no-space]` modifier, so there's no space between
 this sentence and the previous one.
+
+[collect new-paragraph]
+This last sentence is in a new paragraph.
 
 
 
