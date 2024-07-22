@@ -10,6 +10,8 @@
 [Javascript]
 engine.extend('2.0.0', () => {
     engine.template.inserts.add({
+        name: "^ ",
+        description: "Print the contents of a variable, capitalizing it.",
         match: /^\^\s+\S+$/i,
         render(firstArg, props, invocation) {
             const variableToShow = invocation?.slice(1).trimStart();
@@ -29,6 +31,8 @@ engine.extend('2.0.0', () => {
 engine.state.set('__collected', '');
 engine.extend('2.0.0', () => {
     engine.template.modifiers.add({
+        name: "collect",
+        description: "Collect the text in the modifier for later display.",
     	match: /^collect\b/i,
         process(output, {state, invocation}) {
             const modifier = invocation?.slice(7).trimStart().replace(/\s.*/, '').toLowerCase() || '';
@@ -62,6 +66,8 @@ engine.extend('2.0.0', () => {
 
 [Javascript]
 engine.template.inserts.add({
+    name: "show collected",
+    description: "Show all text collected in previous [collect] modifiers.",
 	match: /^show\s+collected/i,
 	render: (first_arg, props, invocation) => {
     	if (typeof(__collected) === undefined) {
@@ -83,6 +89,8 @@ engine.template.inserts.add({
 [Javascript]
 engine.extend('2.0.0', () => {
     engine.template.inserts.add({
+        name: "if",
+        description: "Show text if the contents of a variable evaluates to true.",
     	match: /^if\s+[^:,]/i,
         render: (first_arg, props, invocation) => {
             const condition = invocation.split(':')[0].slice(3);
@@ -123,6 +131,8 @@ libfunc.hashInvocation = (invocation) => {
 }
 engine.extend('2.0.0', () => {
     engine.template.inserts.add({
+        name: "first time",
+        description: "Show text only the first time the insert is viewed.",
         match: /^first\s+time\b/i,
         render: (to_print, props, invocation) => {
             const hash = libfunc.hashInvocation(invocation);
@@ -137,6 +147,8 @@ engine.extend('2.0.0', () => {
 [Javascript]
 engine.extend('2.0.0', () => {
     engine.template.inserts.add({
+        name: "one of",
+        description: "Display varying text every time the player encounters this insert.",
         match: /^one\s+of\b/i,
         render(choices, props, invocation) {
             const hash = libfunc.hashInvocation(invocation);
