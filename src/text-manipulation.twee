@@ -142,6 +142,21 @@ engine.extend('2.0.0', () => {
             }
         }
     });
+
+    engine.template.modifiers.add({
+        name: "firstrun",
+        description: "Show modified text only the first time the passage is viewed.",
+        match: /^firstrun\b/i,
+        process(output, {invocation, state}) {
+            const hash = libfunc.hashInvocation(invocation);
+            if (zOneOfTracking[hash] === undefined) {
+                zOneOfTracking[hash] = true;
+            } else {
+                output.text = '';
+                output.startsNewParagraph = false;
+            }
+        }
+    });
 });
 
 [Javascript]
