@@ -20,7 +20,7 @@ Want to see them in action? [Check out the demo](https://sgranade.github.io/sarg
 
 > [!WARNING]
 >
-> Chapbook version 2.0.0 has a bug in how it processes Javascript code. It's been fixed, but until the next version is released, you'll need to build the story format [from its source code](https://github.com/klembot/chapbook) to use these extensions.
+> Chapbook version 2.0.0 has a bug in how it processes Javascript code. These extensions only work with Chapbook 2.1.0 or higher.
 
 The extensions are defined in the `text-manipulation.twee` file in the `src` directory. If you're writing your game using [Twee](https://dev.to/lazerwalker/a-modern-developer-s-workflow-for-twine-4imp), download that file and add it to your project. Then, in your starting passage, use `{embed passage: '_Add All Text Manipulation'}` to make all of the inserts and modifiers available.
 
@@ -45,7 +45,7 @@ Finally, if you want access to the collected text, it lives in the Chapbook vari
 The `{if [condition]}` insert is like the `[if]` conditional display modifier, except that it's an insert that you can use in the middle of other text. For example, you might want to include a link to a new passage if the player has a key that will unlock a door.
 
 ```
-The door is locked. {if hasKey: 'You could try [[unlocking it]].'
+The door is locked. {if hasKey: 'You could try [[unlocking it]].}'
 ```
 
 You can also show the player something different if the condition is false.
@@ -87,7 +87,7 @@ If the floodlight is off the first time the player visits the passage, the `{fir
 The `{one of}` insert lets you display varying text each time it's triggered. For example, say you wanted to show different flavor text every time a player entered a cave.
 
 ```
-The cave is low and dark. {one of: ['Water splashes from the ceiling.', 'From ahead, a bat's squeak echoes off of the cave walls.', 'Your torch flickers.']}
+The cave is low and dark. {one of: ['Water splashes from the ceiling.', 'From ahead, the squeak of a bat echoes off of the cave walls.', 'Your torch flickers.']}
 ```
 
 Each time the player visits the passage, one of the choices in the list will be shown at random.

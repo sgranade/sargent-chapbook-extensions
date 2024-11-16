@@ -8,10 +8,12 @@
 
 :: _Add Capitalization Insert
 [Javascript]
-engine.extend('2.0.0', () => {
+engine.extend('2.1.0', () => {
     engine.template.inserts.add({
         name: "^ ",
+        syntax: "{^ _expression_}",
         description: "Print the contents of a variable, capitalizing it.",
+        completions: ["^ "],
         match: /^\^\s+\S+$/i,
         render(firstArg, props, invocation) {
             const variableToShow = invocation?.slice(1).trimStart();
@@ -29,10 +31,12 @@ engine.extend('2.0.0', () => {
 :: _Add Text Collection Modifier and Insert
 [Javascript]
 engine.state.set('__collected', '');
-engine.extend('2.0.0', () => {
+engine.extend('2.1.0', () => {
     engine.template.modifiers.add({
         name: "collect",
+        syntax: "[collect], [collect new], [collect no-space], [collect new-paragraph]",
         description: "Collect the text in the modifier for later display.",
+        completions: ["collect", "collect new", "collect no-space", "collect new-paragraph"],
     	match: /^collect\b/i,
         process(output, {state, invocation}) {
             const modifier = invocation?.slice(7).trimStart().replace(/\s.*/, '').toLowerCase() || '';
@@ -65,23 +69,25 @@ engine.extend('2.0.0', () => {
 });
 
 [Javascript]
-engine.extend('2.0.0', () => {
+engine.extend('2.1.0', () => {
     engine.template.inserts.add({
         name: "show collected",
+        syntax: "{show collected}",
         description: "Show all text collected in previous [collect] modifiers.",
-    	match: /^show\s+collected/i,
-    	render: (first_arg, props, invocation) => {
-        	if (typeof(__collected) === undefined) {
+        completions: ["show collected"],
+        match: /^show\s+collected/i,
+        render: (first_arg, props, invocation) => {
+            if (typeof(__collected) === undefined) {
                 if (config.testing) {
-                	throw new Error('{show collected} called before any text was collected');
+                    throw new Error('{show collected} called before any text was collected');
                 }
             }
-        	const output = __collected;
+            const output = __collected;
             if (!props['keep']) {
-            	__collected = '';
+                __collected = '';
             }
             return output;
-	    }
+        }
     })
 });
 
@@ -89,10 +95,23 @@ engine.extend('2.0.0', () => {
 
 :: _Add Conditional Insert
 [Javascript]
-engine.extend('2.0.0', () => {
+engine.extend('2.1.0', () => {
     engine.template.inserts.add({
         name: "if",
+        syntax: "{if _condition_: 'text', else: 'other text'}",
         description: "Show text if the contents of a variable evaluates to true.",
+        completions: ["if"],
+        arguments: {
+            firstArgument: {
+                required: true,
+                placeholder: "'text'"
+            },
+            optionalProps: {
+                else: {
+                    placeholder: "'other text'"
+                }
+            }
+        },
     	match: /^if\s+[^:,]/i,
         render: (first_arg, props, invocation) => {
             const condition = invocation.split(':')[0].slice(3);
@@ -131,10 +150,18 @@ libfunc.hashInvocation = (invocation) => {
     //return passage.name + invocation;
     return libfunc.embarassinglySimpleHashCode(passage.name + invocation).toString();
 }
-engine.extend('2.0.0', () => {
+engine.extend('2.1.0', () => {
     engine.template.inserts.add({
         name: "first time",
-        description: "Show text only the first time the insert is viewed.",
+        syntax: "{first time: 'text'}",
+        description: "Show snippet of text only the first time the insert is viewed.",
+        completions: ["first time"],
+        arguments: {
+            firstArgument: {
+                required: true,
+                placeholder: "'text'"
+            }
+        },
         match: /^first\s+time\b/i,
         render: (to_print, props, invocation) => {
             const hash = libfunc.hashInvocation(invocation);
@@ -147,7 +174,8 @@ engine.extend('2.0.0', () => {
 
     engine.template.modifiers.add({
         name: "first time",
-        description: "Show modified text only the first time the passage is viewed.",
+        syntax: "[first time]",
+        description: "Show block of text only the first time the passage is viewed.",
         match: /^first\s+time\b/i,
         process(output, {invocation, state}) {
             const hash = libfunc.hashInvocation(invocation);
@@ -162,10 +190,22 @@ engine.extend('2.0.0', () => {
 });
 
 [Javascript]
-engine.extend('2.0.0', () => {
+engine.extend('2.1.0', () => {
     engine.template.inserts.add({
         name: "one of",
+        syntax: "{one of: ['choice 1', 'choice 2'], order: 'order'}",
         description: "Display varying text every time the player encounters this insert.",
+        completions: ["one of"],
+        arguments: {
+            firstArgument: {
+                required: true,
+            },
+            optionalProps: {
+                order: {
+                    placeholder: "'order'"
+                }
+            }
+        },
         match: /^one\s+of\b/i,
         render(choices, props, invocation) {
             const hash = libfunc.hashInvocation(invocation);

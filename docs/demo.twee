@@ -396,7 +396,7 @@ oneOfInsert: "{one of}"
 firstTimeInsert: "{first time}"
 firstTimeModifier: "[first time]"
 _oneOfInsertHeadsAndTails: "{one of: ['heads', 'tails']}"
-_oneOfInsertWithOptions: "{one of: ['Water splashes from the ceiling.', 'From ahead, a bat's squeak echoes off of the cave walls.', 'Your torch flickers.']}"
+_oneOfInsertWithOptions: "{one of: ['Water splashes from the ceiling.', 'From ahead, the squeak of a bat echoes off of the cave walls.', 'Your torch flickers.']}"
 --
 ## One Of and First Time Inserts: Overview
 
@@ -411,7 +411,7 @@ The cave is low and dark. {_oneOfInsertWithOptions}
 The first time the player visits the passage, it might print,
 
 <blockquote>
-The cave is low and dark. From ahead, a bat's squeak echoes off of the cave walls.
+The cave is low and dark. From ahead, the squeak of a bat echoes off of the cave walls.
 </blockquote>
 
 The next time, it might print,
