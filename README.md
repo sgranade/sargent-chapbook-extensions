@@ -9,7 +9,7 @@ The extentions are focused on manipulating text to show later or display somethi
 
 - The `[collect]` modifier saves text to a variable instead of showing it, letting you build up longer descriptions that you can then show using the `{show collected}` insert.
 - The `{if [condition]}` insert only shows text if the condition is true.
-- The `{first time}` insert shows text one time only. 
+- The `[first time]` modifier and `{first time}` insert show text one time only. 
 - The `{one of}` insert shows different text every time.
 - The `{^ [expression]}` insert capitalizes the string value of the variable or expression.
 
@@ -55,17 +55,24 @@ The door is locked. {if hasKey: 'You could try [[unlocking it]].', else: 'You ne
 ```
 
 
-### First Time Insert
+### First Time Modifier and Insert
 
-The `{first time}` insert only shows its text the first time. After that, the text isn't shown.
+The `[first time]` modifier and `{first time}` insert only show their text the first time. After that, the text isn't shown. The modifier is useful for paragraph-sized portions of text.
+
+```
+[first time]
+A flashlight rakes across the bushes where you're hidden, but the guard doesn't see you and, satisfied, walks on.
+```
+
+The insert is better for smaller snippets of text, or text that appear in the middle of a paragraph or sentence.
 
 ```
 The floodlight illuminating you is painfully bright. {first time: "You shield your eyes, but can't see who's behind the light."}
 ```
 
-Note that this isn't tied to the player visiting the passage with the insert, but to the player being _shown the text_. Most of the time that's a distinction without a difference, except when you use the insert in a conditonal block.
+Note that these aren't tied to the player visiting the passage with the modifier or insert, but to the player being _shown the text_. Most of the time that's a distinction without a difference, except when you use the modifier or insert in a conditonal block.
 
-Let's extend the example above.
+Let's extend the insert example above.
 
 ```
 [if floodlightOn]
@@ -109,3 +116,8 @@ The `{^ [variable]}` insert capitalizes the variable's contents and shows it. Fo
 ```
 
 This could display "Their clothes are folded neatly at the foot of their bed" or "His clothes are folded neatly at the foot of his bed."
+
+
+## Credits
+
+- Thanks to [oddevan](https://github.com/oddevan) for contributing the `[first time]` modifier.

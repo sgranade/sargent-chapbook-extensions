@@ -2,7 +2,7 @@
 {embed passage: '_Add Capitalization Insert'}
 {embed passage: '_Add Text Collection Modifier and Insert'}
 {embed passage: '_Add Conditional Insert'}
-{embed passage: '_Add One Of and First Time Inserts'}
+{embed passage: '_Add One Of and First Time Inserts and Modifiers'}
 
 
 
@@ -65,22 +65,24 @@ engine.extend('2.0.0', () => {
 });
 
 [Javascript]
-engine.template.inserts.add({
-    name: "show collected",
-    description: "Show all text collected in previous [collect] modifiers.",
-	match: /^show\s+collected/i,
-	render: (first_arg, props, invocation) => {
-    	if (typeof(__collected) === undefined) {
-            if (config.testing) {
-            	throw new Error('{show collected} called before any text was collected');
+engine.extend('2.0.0', () => {
+    engine.template.inserts.add({
+        name: "show collected",
+        description: "Show all text collected in previous [collect] modifiers.",
+    	match: /^show\s+collected/i,
+    	render: (first_arg, props, invocation) => {
+        	if (typeof(__collected) === undefined) {
+                if (config.testing) {
+                	throw new Error('{show collected} called before any text was collected');
+                }
             }
-        }
-    	const output = __collected;
-        if (!props['keep']) {
-        	__collected = '';
-        }
-        return output;
-	}
+        	const output = __collected;
+            if (!props['keep']) {
+            	__collected = '';
+            }
+            return output;
+	    }
+    })
 });
 
 
@@ -102,7 +104,7 @@ engine.extend('2.0.0', () => {
 
 
 
-:: _Add One Of and First Time Inserts
+:: _Add One Of and First Time Inserts and Modifiers
 [Javascript]
 engine.state.set('zOneOfTracking', {});
 libfunc = {};
