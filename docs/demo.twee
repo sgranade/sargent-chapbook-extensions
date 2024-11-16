@@ -490,14 +490,18 @@ in different orders.
 
 :: First Time Insert
 _firstTimeExample: '{first time: "You shield your eyes, but can\'t see who\'s behind the light."}'
+_firstRunExample: "[first time]\nIf you close your eyes, it almost feels like you've been here before."
 --
 ## One Of and First Time Inserts: Showing Text the First Time
 
 The `{firstTimeInsert}` insert only shows
-its text the first time the player visits the passage. Consider the code:
+its text the first time the player visits the passage. The `{firstRunMod}` modifier does the same,
+but as a modifier. Consider the code:
 
 <pre>
 The floodlight illuminating you is painfully bright. {_firstTimeExample}
+
+{_firstRunExample}
 </pre>
 
 The first time the player visits the passage, they'll see:
@@ -505,6 +509,8 @@ The first time the player visits the passage, they'll see:
 <blockquote>
 The floodlight illuminating you is painfully bright. You shield your eyes, but can't 
 see who's behind the light.
+
+If you close your eyes, it almost feels like you've been here before.
 </blockquote>
 
 The second time, and every time after that, the player will see:
@@ -522,6 +528,7 @@ The floodlight illuminating you is painfully bright.
 
 :: First Time Demo
 _firstTimeInsertDemo: "{first time: 'You catch your foot on a stalagmite and nearly fall.'}"
+_firstRunModifierDemo: "[first time]\nYou have no memory of this place."
 --
 ## Showing First Time in Action
 
@@ -529,12 +536,19 @@ This passage contains the code:
 
 <pre>
 The cave is low and dark. {_firstTimeInsertDemo}
+
+{_firstRunModifierDemo}
 </pre>
 
 Here's what it looks like.
 
 <blockquote>
 The cave is low and dark. {first time: 'You catch your foot on a stalagmite and nearly fall.'}
+
+[first time]
+You have no memory of this place.
+
+[cont]
 </blockquote>
 
 > [[View this passage again->First Time Demo]]
