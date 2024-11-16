@@ -490,7 +490,7 @@ in different orders.
 
 :: First Time Insert
 _firstTimeExample: '{first time: "You shield your eyes, but can\'t see who\'s behind the light."}'
-_firstRunExample: "[firstrun]\nIf you close your eyes, it almost feels like you've been here before."
+_firstRunExample: "[first time]\nIf you close your eyes, it almost feels like you've been here before."
 --
 ## One Of and First Time Inserts: Showing Text the First Time
 
@@ -528,7 +528,7 @@ The floodlight illuminating you is painfully bright.
 
 :: First Time Demo
 _firstTimeInsertDemo: "{first time: 'You catch your foot on a stalagmite and nearly fall.'}"
-_firstRunModifierDemo: "[firstrun]\nYou have no memory of this place."
+_firstRunModifierDemo: "[first time]\nYou have no memory of this place."
 --
 ## Showing First Time in Action
 
@@ -545,7 +545,7 @@ Here's what it looks like.
 <blockquote>
 The cave is low and dark. {first time: 'You catch your foot on a stalagmite and nearly fall.'}
 
-[firstrun]
+[first time]
 You have no memory of this place.
 
 [cont]
