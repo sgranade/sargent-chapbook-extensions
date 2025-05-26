@@ -49,6 +49,7 @@ td {
 config.style.page.theme.enableSwitching: false
 showText: false
 hasKey: false
+strength: 0
 applesPicked: 1
 pronounNum: 1
 --
@@ -226,9 +227,12 @@ This last sentence is in a new paragraph.
 :: Reset or Modify Text Collection
 _collectModifier: "[collect]"
 _collectNewModifier: "[collect new]"
+_emptyCollected: "{empty collected}"
 _contModifier: "[cont]"
 _showCollectedKeepInsert: "{show collected, keep: true}"
 _collectedVariableShow: "{__collected}"
+_codeTag: "<code>"
+_codeTagClose: "</code>"
 __collected: ''
 --
 ## Text Collection: Reset or Modify Text Collection
@@ -236,7 +240,7 @@ __collected: ''
 By default, `[collect]` adds to any text that's already been collected, and <code>{_showCollectedInsert}</code> empties the
 collection so you can start over. You can change both of those behaviors.
 
-`[collect new]` gets rid of all the previously-collected text and starts over.
+`[collect new]` gets rid of all the previously-collected text and starts over, as does `{_emptyCollected}`.
 
 <code>{_showCollectedKeepInsert}</code> shows the collected text without getting rid of it.
 
@@ -245,45 +249,53 @@ Finally, the collected text is stored in the Chapbook variable `__collected`. Yo
 Let's try that out. Here's the code in this passage:
 
 <pre>
-At the start, `__collected` contains: {_collectedVariableShow}
+At the start, `__collected` contains: {_codeTag}{_collectedVariableShow}{_codeTagClose}
 
 {_collectModifier}
 If this works, this text will be thrown away.
 
 {_contModifier}
-After the first collect, `__collected` contains: {_collectedVariableShow}
+After the first collect, `__collected` contains: {_codeTag}{_collectedVariableShow}{_codeTagClose}
 
 {_collectNewModifier}
 This should be the only text that's collected.
 
 {_contModifier}
-After the second collect, `__collected` contains: {_collectedVariableShow}
+After the second collect, `__collected` contains: {_codeTag}{_collectedVariableShow}{_codeTagClose}
 
 Let's show the collection using the insert with `keep: true`: {_showCollectedKeepInsert}
 
-After the insert with `keep: true`, `__collected` contains: {_collectedVariableShow}
+After the insert with `keep: true`, `__collected` contains: {_codeTag}{_collectedVariableShow}{_codeTagClose}
+
+Now let's empty the collected text without showing it. {_emptyCollected}
+
+After the `{_emptyCollected}` insert, `__collected` contains: {_codeTag}{_collectedVariableShow}{_codeTagClose}
 </pre>
 
 Here's how Chapbook renders it.
 
 <blockquote>
-At the start, <code>__collected</code> contains: {__collected}
+At the start, <code>__collected</code> contains: <code>{__collected}</code>
 
 [collect]
 If this works, this text will be thrown away.
 
 [cont]
-After the first collect, `__collected` contains: {__collected}
+After the first collect, `__collected` contains: <code>{__collected}</code>
 
 [collect new]
 This should be the only text that's collected.
 
 [cont]
-After the second collect, `__collected` contains: {__collected}
+After the second collect, `__collected` contains: <code>{__collected}</code>
 
 Let's show the collection using the insert with `keep: true`: {show collected, keep: true}
 
-After the insert with `keep: true`, `__collected` contains: {__collected}
+After the insert with `keep: true`, `__collected` contains: <code>{__collected}</code>
+
+Now let's empty the collected text without showing it. {empty collected}
+
+After the `{_emptyCollected}` insert, `__collected` contains: <code>{__collected}</code>
 </blockquote>
 
 > [[Collecting more than one chunk of text->Collect Multiple Texts]]
@@ -309,6 +321,7 @@ After the insert with `keep: true`, `__collected` contains: {__collected}
 | ------ | ------------ |
 | <code>&lcub;show collected&rcub;</code> | Show the collected text and **empty the collection**. |
 | <code>&lcub;show collected, keep: true&rcub;</code> | Show the collected text and **keep the collection**. |
+| <code>&lcub;empty collected&rcub;</code> | Empty the collection **without showing it**. |
 
 ### Under the Hood
 
@@ -420,32 +433,35 @@ The next time, it might print,
 The cave is low and dark. Water splashes from the ceiling.
 </blockquote>
 
-`{oneOfInsert}` takes an array of text items, called _choices_, and randomly shows one of
-thoise choices. The next time, it shows a different choice. While each choice is randomly
+`{oneOfInsert}` takes an array of text items, called _choices_, and shows one of
+those choices either randomly or selected by a separate variable. If it shows the
+choices randomly, the next time, it shows a different choice. While each choice is randomly
 selected, the same text won't be shown twice in a row. That is, the insert
-`{_oneOfInsertHeadsAndTails}`  will never show `heads` and then `heads` again.
+`{_oneOfInsertHeadsAndTails}` will never show `heads` and then `heads` again.
 
 You can specify different orders to show the choices in, including shuffling the choices or
-showing them in order until they run out. There's also a special case of showing choices: 
-showing text only the first time the player visits the passage.
+showing them in order until they run out. You can also show a choice based on a separate
+variable. Finally, there's a special case of showing choices: showing text only the first time
+the player visits the passage.
 
-> [[Controlling the order of what's shown->One Of Insert Ordering]]
+> [[Controlling the order of what's randomly shown->One Of Insert Random Ordering]]
+> [[Showing text based on a variable->One Of Insert Variable-Based Ordering]]
 > [[Showing text the first time only->First Time Insert]]
 > [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
 > **[[Back to the list of extensions->List of Extensions]]**
 
 
 
-:: One Of Insert Ordering
-_oneOfInsertSummary: "{one of: ['choice 1', 'choice 2', 'choice 3'], order: 'order'}"
+:: One Of Insert Random Ordering
+_oneOfInsertRandomSummary: "{one of: ['choice 1', 'choice 2', 'choice 3'], order: 'order'}"
 --
-## One Of and First Time Inserts: Controlling the Order
+## One Of and First Time Inserts: Controlling the Random Order
 
-You can control the order that the `{oneOfInsert}` insert shows its choices using the
+You can control the order that the `{oneOfInsert}` insert randomly shows its choices using the
 `order` parameter:
 
 <pre>
-{_oneOfInsertSummary}
+{_oneOfInsertRandomSummary}
 </pre>
 
 `order` can be any of the following:
@@ -457,6 +473,40 @@ You can control the order that the `{oneOfInsert}` insert shows its choices usin
 - `'cycling'`: Show the choices in order, repeating the order after the last one's shown.
 
 > [[Show `{oneOfInsert}` ordering in action->One Of Demo]]
+> [[Showing text based on a variable->One Of Insert Variable-Based Ordering]]
+> [[Showing text the first time only->First Time Insert]]
+> [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
+> **[[Back to the list of extensions->List of Extensions]]**
+
+
+
+:: One Of Insert Variable-Based Ordering
+_oneOfInsertVariableSummary: "{one of: ['weak', 'averagely strong', 'strong'], select: 'strength'}"
+strength: strength + 1
+strength (strength > 2): 0
+--
+## One Of and First Time Inserts: Showing Text Based on a Variable
+
+Instead of letting `{oneOfInsert}` randomly show its choices, you can have it
+show a choice based on the number stored in a variable. This can be useful if, for example,
+you have a numeric variable tracking a player's strength and you want to give a text
+description of it.
+
+In this passage, the variable `strength` is `{strength}`. The code:
+
+<pre>
+You are {_oneOfInsertVariableSummary}.
+</pre>
+
+produces the following:
+
+<blockquote>
+You are {one of: ['weak', 'averagely strong', 'strong'], select: 'strength'}.
+</blockquote>
+
+> [[Show this again, only this time with a different strength value->One Of Insert Variable-Based Ordering]]
+> [[Show `{oneOfInsert}` ordering in action->One Of Demo]]
+> [[Showing text based on a variable->One Of Insert Variable-Based Ordering]]
 > [[Showing text the first time only->First Time Insert]]
 > [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
 > **[[Back to the list of extensions->List of Extensions]]**
@@ -484,6 +534,7 @@ in different orders.
 </blockquote>
 
 > [[View this passage again->One Of Demo]]
+> [[Showing text based on a variable->One Of Insert Variable-Based Ordering]]
 > [[Showing text the first time only->First Time Insert]]
 > [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
 > **[[Back to the list of extensions->List of Extensions]]**
@@ -520,7 +571,8 @@ The floodlight illuminating you is painfully bright.
 </blockquote>
 
 > [[Show `{firstTimeInsert}` insert and `{firstTimeModifier}` modifier in action->First Time Demo]]
-> [[Controlling the order of what's shown->One Of Insert Ordering]]
+> [[Controlling the order of what's randomly shown->One Of Insert Random Ordering]]
+> [[Showing text based on a variable->One Of Insert Variable-Based Ordering]]
 > [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
 > **[[Back to the list of extensions->List of Extensions]]**
 
@@ -552,7 +604,8 @@ You have no memory of this place.
 </blockquote>
 
 > [[View this passage again->First Time Demo]]
-> [[Controlling the order of what's shown->One Of Insert Ordering]]
+> [[Controlling the order of what's randomly shown->One Of Insert Random Ordering]]
+> [[Showing text based on a variable->One Of Insert Variable-Based Ordering]]
 > [[Summary of all `{oneOfInsert}` insert options->One Of Insert Summary]]
 > **[[Back to the list of extensions->List of Extensions]]**
 
@@ -561,7 +614,8 @@ You have no memory of this place.
 :: One Of Insert Summary
 _firstTimeInsertSummary: "{first time: 'This will only show up on the first visit.'}"
 _firstTimeModifierSummary: "[first time]\nThis also will only show up on the first visit."
-_oneOfInsertSummary: "{one of: ['choice 1', 'choice 2', 'choice 3'], order: 'order'}"
+_oneOfInsertRandomSummary: "{one of: ['choice 1', 'choice 2', 'choice 3'], order: 'order'}"
+_oneOfInsertVariableSummary: "{one of: ['choice 1', 'choice 2', 'choice 3'], select: 'var'}"
 --
 ## One Of and First Time Inserts and Modifiers: Summary
 
@@ -573,7 +627,9 @@ To show a longer bit of text only the first time a passage is visited:
 {_firstTimeModifierSummary}
 ```
 
-`{_oneOfInsertSummary}` to show one of the array of choices.
+`{_oneOfInsertVariableSummary}` to show one of the array of choices based on the number in the variable `var`.
+
+`{_oneOfInsertRandomSummary}` to show one of the array of choices randomly.
 
 | `order` | What It Does |
 | -------- | ------------ |
@@ -583,7 +639,8 @@ To show a longer bit of text only the first time a passage is visited:
 | `'stopping'` | Show the choices in order. After the last one's shown, it's shown again forever after. |
 | `'cycling'` | Show the choices in order. After the last one's shown, the sequence starts over with the first. |
 
-> [[Controlling the order of what's shown->One Of Insert Ordering]]
+> [[Controlling the order of what's randomly shown->One Of Insert Random Ordering]]
+> [[Showing text based on a variable->One Of Insert Variable-Based Ordering]]
 > [[Showing text the first time only->First Time Insert]]
 > **[[Back to the list of extensions->List of Extensions]]**
 

@@ -35,7 +35,7 @@ The `[collect]` modifier collects text to be shown later or manipulated. All tex
 
 You can use `[collect]` more than once to keep adding new text to what's already been collected. By default, a single space is added between each new collected text. If you don't want that space, use `[collect no-space]`. If you want a paragraph between them instead, use `[collect new-paragraph]`.
 
-The insert `{show collected}` empties the collection so that you can start over. To show the collected text while keeping it, use the insert `{show collected; keep=true}`. You can also guarantee that you're starting a fresh collection with the modifier `[collect new]`.
+The insert `{show collected}` empties the collection so that you can start over. To show the collected text while keeping it, use the insert `{show collected; keep=true}`. If you want to empty the collection without showing it, you can use `{empty collected}`. You can also guarantee that you're starting a fresh collection with the modifier `[collect new]`.
 
 Finally, if you want access to the collected text, it lives in the Chapbook variable `__collected`.
 
@@ -105,6 +105,12 @@ You can control the order that the choices will be shown using the `order` param
 - `'shuffled'`: The choices are shuffled, then shown in that shuffled order. Once all of them have been shown, they’re re-shuffled.
 - `'stopping'`: Show the choices in order, stopping with the last one and thereafter showing it forever.
 - `'cycling'`: Show the choices in order, repeating the order after the last one’s shown.
+
+Alternately, if you want to select text based on the number in a variable, you can use the `select` parameter.
+
+```
+{one of: ['choice 1', 'choice 2', 'choice 3'], select: 'variable'}
+```
 
 
 ### Capitalization Insert

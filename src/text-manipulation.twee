@@ -10,10 +10,15 @@
 [Javascript]
 engine.extend('2.1.0', () => {
     engine.template.inserts.add({
-        name: "^ ",
-        syntax: "{^ _expression_}",
+        name: "^",
+        syntax: "{^ _variable_}",
         description: "Print the contents of a variable, capitalizing it.",
-        completions: ["^ "],
+        completions: "^",
+        arguments: {
+            firstArgument: {
+                required: "ignored"
+            }
+        },
         match: /^\^\s+\S+$/i,
         render(firstArg, props, invocation) {
             const variableToShow = invocation?.slice(1).trimStart();
@@ -72,9 +77,17 @@ engine.extend('2.1.0', () => {
 engine.extend('2.1.0', () => {
     engine.template.inserts.add({
         name: "show collected",
-        syntax: "{show collected}",
-        description: "Show all text collected in previous [collect] modifiers.",
-        completions: ["show collected"],
+        syntax: "{show collected, _keep: true_}",
+        description: "Show all text collected in previous [collect] modifiers. The collected text is emptied unless `keep` is true.",
+        completions: "show collected",
+        arguments: {
+            firstArgument: {
+                required: "ignored"
+            },
+            optionalProps: {
+                keep: "true"
+            }
+        },
         match: /^show\s+collected/i,
         render: (first_arg, props, invocation) => {
             if (typeof(__collected) === undefined) {
@@ -88,35 +101,52 @@ engine.extend('2.1.0', () => {
             }
             return output;
         }
-    })
+    });
+});
+
+engine.extend('2.1.0', () => {
+    engine.template.inserts.add({
+        name: "empty collected",
+        syntax: "{empty collected}",
+        description: "Empty all text collected in previous [collect] modifiers without displaying it.",
+        completions: "empty collected",
+        arguments: {
+            firstArgument: {
+                required: "ignored"
+            },
+        },
+        match: /^empty\s+collected/i,
+        render: (first_arg, props, invocation) => {
+            __collected = '';
+        }
+    });
 });
 
 
 
 :: _Add Conditional Insert
+{embed passage: "_Add Library Functions"}
 [Javascript]
 engine.extend('2.1.0', () => {
     engine.template.inserts.add({
         name: "if",
-        syntax: "{if _condition_: 'text', else: 'other text'}",
-        description: "Show text if the contents of a variable evaluates to true.",
-        completions: ["if"],
+        syntax: "{if _condition_: 'text to show if condition is true', _else: 'text to show if condition is false'_}",
+        description: "Show text if the contents of a variable evaluates to true. Text can contain {variable} inserts.",
+        completions: "if",
         arguments: {
             firstArgument: {
                 required: true,
-                placeholder: "'text'"
+                placeholder: '"text if true"'
             },
             optionalProps: {
-                else: {
-                    placeholder: "'other text'"
-                }
+                else: '"text if false"'
             }
         },
     	match: /^if\s+[^:,]/i,
         render: (first_arg, props, invocation) => {
             const condition = invocation.split(':')[0].slice(3);
-            const value = new Function(`return ${condition};`)();
-            return ((value) ? first_arg : props['else']) || '';
+            const value = new Function(`return (${condition});`)();
+            return libfunc.replaceVariableInserts(((value) ? first_arg : props['else']) || '');
         }
     });
 });
@@ -124,42 +154,19 @@ engine.extend('2.1.0', () => {
 
 
 :: _Add One Of and First Time Inserts and Modifiers
+{embed passage: "_Add Library Functions"}
 [Javascript]
 engine.state.set('zOneOfTracking', {});
-libfunc = {};
-libfunc.randInt = (max) => {
-    return Math.floor(Math.random() * max);  // Random int from 0 to max-1
-}
-libfunc.shuffleArray = (arr) => {
-    for (let i = arr.length - 1; i > 0; --i) {
-        const j = libfunc.randInt(i + 1);
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-}
-libfunc.embarassinglySimpleHashCode = (s) => {
-    let hash = 0;
-    for (let i = 0; i < s.length; ++i) {
-        let chr = s.charCodeAt(i);
-        hash = (hash << 5) - hash + chr;
-        hash |= 0;
-    }
-    return hash;
-}
-libfunc.hashInvocation = (invocation) => {
-    //return passage.name + invocation;
-    return libfunc.embarassinglySimpleHashCode(passage.name + invocation).toString();
-}
 engine.extend('2.1.0', () => {
     engine.template.inserts.add({
         name: "first time",
-        syntax: "{first time: 'text'}",
-        description: "Show snippet of text only the first time the insert is viewed.",
-        completions: ["first time"],
+        syntax: "{first time: 'text to show the first time only'}",
+        description: "Shows its text only the first time a player encounters it.",
+        completions: "first time",
         arguments: {
             firstArgument: {
                 required: true,
-                placeholder: "'text'"
+                placeholder: '"text to show"'
             }
         },
         match: /^first\s+time\b/i,
@@ -193,25 +200,49 @@ engine.extend('2.1.0', () => {
 engine.extend('2.1.0', () => {
     engine.template.inserts.add({
         name: "one of",
-        syntax: "{one of: ['choice 1', 'choice 2'], order: 'order'}",
-        description: "Display varying text every time the player encounters this insert.",
-        completions: ["one of"],
+        syntax: "{one of: ['text', 'other text'], _select: 'variable', order: 'order'_}",
+        description: "Show varying text every time the player sees it. If 'select' is set to a variable that contains a number, the insert will show that value in the array. 'order' can be 'random' (the default), 'pure random', 'shuffled', 'stopping', or 'cycling'.",
+        completions: "one of",
         arguments: {
             firstArgument: {
                 required: true,
+                placeholder: '["text"]',
             },
             optionalProps: {
-                order: {
-                    placeholder: "'order'"
-                }
+                select: '"variable"',
+                order: '"pure random"'
             }
         },
         match: /^one\s+of\b/i,
         render(choices, props, invocation) {
+            const origInvocation = `{${invocation}}`;
             const hash = libfunc.hashInvocation(invocation);
             let prev = zOneOfTracking[hash];
             let ret;
             const order = (props.order || '').toLowerCase();
+            const expression = (props.select || '');
+            // Handle selecting by variable separately since it doesn't need an order
+            if (expression !== '') {
+                let errorMessage = '';
+                const selectValue = new Function(`return (${expression});`)();
+                if (typeof(selectValue) !== 'number') {
+                    errorMessage = `The expression ${expression} must evaluate to a number to be used in a {one of} insert`;
+                }
+                else if (selectValue < 0 || selectValue >= choices.length) {
+                    errorMessage = `The expression ${expression} must evaluate to a number between 0 and ${choices.length - 1} to be used in the {one of} insert`;
+                }
+                else {
+                    ret = choices[selectValue];
+                }
+                if (errorMessage) {
+                    if (config.testing) {
+                        throw new Error(errorMessage);
+                    }
+                    ret = origInvocation;
+                }
+                return ret;
+            }
+
             if (order === 'random' || order === '') {
                 let choice = prev;
                 while (choice == prev) {
@@ -255,3 +286,52 @@ engine.extend('2.1.0', () => {
         }
     });
 });
+
+
+
+:: _Add Library Functions
+[Javascript]
+libfunc = {};
+libfunc.randInt = (max) => {
+    return Math.floor(Math.random() * max);  // Random int from 0 to max-1
+}
+libfunc.shuffleArray = (arr) => {
+    for (let i = arr.length - 1; i > 0; --i) {
+        const j = libfunc.randInt(i + 1);
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+libfunc.embarassinglySimpleHashCode = (s) => {
+    let hash = 0;
+    for (let i = 0; i < s.length; ++i) {
+        let chr = s.charCodeAt(i);
+        hash = (hash << 5) - hash + chr;
+        hash |= 0;
+    }
+    return hash;
+}
+libfunc.hashInvocation = (invocation) => {
+    return libfunc.embarassinglySimpleHashCode(passage.name + invocation).toString();
+}
+libfunc.replaceVariableInserts = (s) => {
+    return s.replace(/\{\S+\}/g, (insert) => {
+        let value;
+
+        const invocation = insert.slice(1, -1);
+        const dereferenceMatch = /(.+)\[(.+)\]$/.exec(invocation);
+        if (dereferenceMatch) {
+            value = engine.state.get(dereferenceMatch[1]);
+            if (value !== undefined) {
+                value = value[dereferenceMatch[2]];
+            }
+        } else {
+            value = engine.state.get(invocation);
+        }
+
+        if (value !== undefined) {
+            return value;
+        }
+        return insert;
+    });
+}
